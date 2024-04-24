@@ -279,9 +279,8 @@ class AbstractCloudFoundryDeployer {
 				})
 				.exponentialBackoff(Duration.ofMillis(initialRetryDelay), Duration.ofMillis(statusTimeout))
 				.doOnRetry(c -> logger.debug("Retrying cf call for {}", id))))
-			.doOnError(TimeoutException.class, e -> {
-				logger.error("Retry operation on getStatus failed for {}. Max retry time {}ms", id, statusTimeout);
-			});
+			.doOnError(TimeoutException.class, e ->
+				logger.error("Retry operation on getStatus failed for {}. Max retry time {}ms", id, statusTimeout));
 	}
 
 	/**
@@ -302,7 +301,7 @@ class AbstractCloudFoundryDeployer {
 
 
 				boolean deleted = deleteFileOrDirectory(applicationFile);
-				logger.info((deleted) ? "Successfully deleted the application resource: " + applicationFile.getCanonicalPath() :
+				logger.info(deleted ? "Successfully deleted the application resource: " + applicationFile.getCanonicalPath() :
 						"Could not delete the application resource: " + applicationFile.getCanonicalPath());
 			}
 
@@ -321,7 +320,7 @@ class AbstractCloudFoundryDeployer {
 		if (scheme.startsWith("http")) {
 			return Optional.of(resource.getFile());
 		}
-		if (scheme.equals("maven") && deploymentProperties.isAutoDeleteMavenArtifacts()) {
+		if ("maven".equals(scheme) && deploymentProperties.isAutoDeleteMavenArtifacts()) {
 			return Optional.of(resource.getFile().getParentFile());
 		}
 		return Optional.empty();
@@ -329,9 +328,9 @@ class AbstractCloudFoundryDeployer {
 
 	private boolean deleteFileOrDirectory(File fileToDelete) {
 		boolean deleted;
-		if (fileToDelete.isDirectory())
-			deleted  = FileSystemUtils.deleteRecursively(fileToDelete);
-		else {
+		if (fileToDelete.isDirectory()) {
+			deleted = FileSystemUtils.deleteRecursively(fileToDelete);
+		} else {
 			deleted = fileToDelete.delete();
 		}
 		return deleted;

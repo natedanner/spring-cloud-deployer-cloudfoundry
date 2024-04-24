@@ -109,9 +109,8 @@ public class CloudFoundryAppDeployer extends AbstractCloudFoundryDeployer implem
 		logger.trace("deploy: Pushing application");
 		pushApplication(deploymentId, request)
 			.timeout(Duration.ofSeconds(this.deploymentProperties.getApiTimeout()))
-			.doOnSuccess(item -> {
-				logger.info("Successfully deployed {}", deploymentId);
-			})
+			.doOnSuccess(item ->
+				logger.info("Successfully deployed {}", deploymentId))
 			.doOnError(error -> {
 				if (isNotFoundError().test(error)) {
 					logger.warn("Unable to deploy application. It may have been destroyed before start completed: " + error.getMessage());
@@ -120,9 +119,8 @@ public class CloudFoundryAppDeployer extends AbstractCloudFoundryDeployer implem
 					logError(String.format("Failed to deploy %s", deploymentId)).accept(error);
 				}
 			})
-			.doOnSuccessOrError((r, e) -> {
-				deleteLocalApplicationResourceFile(request);
-			})
+			.doOnSuccessOrError((r, e) ->
+				deleteLocalApplicationResourceFile(request))
 			.subscribe();
 
 		logger.trace("Exiting deploy().  Deployment Id = {}", deploymentId);
@@ -216,7 +214,7 @@ public class CloudFoundryAppDeployer extends AbstractCloudFoundryDeployer implem
 		List<LogMessage> logMessageList = getLogMessage(id).collectList().block(Duration.ofSeconds(this.deploymentProperties.getApiTimeout()));
 		StringBuilder stringBuilder = new StringBuilder();
 		for (LogMessage logMessage: logMessageList) {
-			stringBuilder.append(logMessage.getMessage() + System.lineSeparator());
+			stringBuilder.append(logMessage.getMessage()).append(System.lineSeparator());
 		}
 		return stringBuilder.toString();
 	}
